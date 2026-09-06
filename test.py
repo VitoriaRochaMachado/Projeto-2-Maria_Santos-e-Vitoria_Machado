@@ -23,4 +23,8 @@ def test_deletar_imovel(mock_conectar_banco, client):
     assert response.stauts_code == 200
     assert response.get_json() == {"Mensagem": "imóvel excluído com sucesso"}
 
-    mock_cursor.execute.assert_called_once_with("DELETE FROM ")
+    mock_cursor.execute.assert_called_once_with("DELETE FROM imoveis WHERE id = % ", (1,))
+
+    mock_conn.commit.assert_called_once_with()
+    mock_cursor.close.assert_called_once_with()
+    mock_conn.close.assert_called_once_with()
