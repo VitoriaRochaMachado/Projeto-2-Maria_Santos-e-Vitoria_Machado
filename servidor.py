@@ -1,6 +1,6 @@
 import mysql.connector
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, jsonify
 import os
 
 load_dotenv()
@@ -44,7 +44,27 @@ def criar_tabela():
         cursor.close()
         conn.close()
 
-    if __name__ == "__main__":
-        criar_tabela()
-        app.run(debug=True)
+def deletar_imovel(id):
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM imoveis WHERE id = %s", (int(id),))
+
+        imovel_alterado = cursor.rowcount
+        conn.commit()
+        
+
+        if imovel_alterado == 0:
+            return jsonify({"erro": "Imóvel não encontrado"}), 404
+
+        return jsonify({"Mensagem":"imóvel excluído com sucesso"}), 200
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+if __name__ == "__main__":
+    criar_tabela()
+    app.run(debug=True)
 
