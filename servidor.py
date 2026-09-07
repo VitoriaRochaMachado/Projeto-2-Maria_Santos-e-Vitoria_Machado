@@ -75,7 +75,7 @@ def busca_tipo(tipo):
         imoveis = cursor.fetchall()
         lista_imoveis =[]
 
-        for imovel in lista_imoveis:
+        for imovel in imoveis:
             lista_imoveis.append({
                 'id':imovel[0],
                 'logradouro': imovel[1],
@@ -92,6 +92,32 @@ def busca_tipo(tipo):
         cursor.close()
         conn.close()
 
+@app.route('/imovel/cidade')
+def busca_cidade(cidade):
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    try: 
+        cursor.execute("SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", (cidade,))
+        imoveis = cursor.fetchall()
+        lista_imoveis =[]
+
+        for imovel in imoveis:
+            lista_imoveis.append({
+                'id':imovel[0],
+                'logradouro': imovel[1],
+                'tipo_logradouro': imovel[2],
+                'bairro': imovel[3],
+                'cidade': imovel[4],
+                'cep': imovel[5],
+                'tipo': imovel[6],
+                'valor': imovel[7],
+                'data_aquisicao': imovel[8]
+            })
+        return jsonify(lista_imoveis), 200
+    finally:
+        cursor.close()
+        conn.close()
 
 if __name__ == "__main__":
     criar_tabela()
