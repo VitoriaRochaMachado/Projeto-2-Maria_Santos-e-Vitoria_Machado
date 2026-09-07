@@ -117,7 +117,7 @@ def test_busca_cidade_ok(mock_conectar_banco, client):
     assert response.get_json == [{'id':1, 'logradouro':'Nicole Common', 'tipo_logradouro':'Travessa', 'bairro':'Lake Danielle', 'cidade':'Judymouth', 'cep':'85184','tipo': 'casa em condominio', 'valor': 488423.52, 'data_aquisicao':'2017-07-29'},]
 
     mock_cursor.execute.assert_called_once_with(
-        "SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", ('Judymouth',)
+        "SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", ('Judymouth',)
     )
 
     mock_conn.commit.assert_called_once()
@@ -139,7 +139,7 @@ def test_busca_cidade_vazio(mock_conectar_banco, client):
     assert response.get_json() == []
 
     mock_cursor.execute.assert_called_once_with(
-            "SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", ('JudymouthMM',)
+            "SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", ('JudymouthMM',)
         )
     
     mock_conn.commit.assert_called_once()
