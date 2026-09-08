@@ -55,7 +55,6 @@ def deletar_imovel(id):
         imovel_alterado = cursor.rowcount
         conn.commit()
         
-
         if imovel_alterado == 0:
             return jsonify({"erro": "Imóvel não encontrado"}), 404
 
@@ -65,7 +64,7 @@ def deletar_imovel(id):
         cursor.close()
         conn.close()
 
-@app.route('/imovel/tipo', methods=['GET'])
+@app.route('/imovel/<tipo>', methods=['GET'])
 def busca_tipo(tipo):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -92,13 +91,13 @@ def busca_tipo(tipo):
         cursor.close()
         conn.close()
 
-@app.route('/imovel/cidade')
+@app.route('/imovel/<cidade>')
 def busca_cidade(cidade):
     conn = conectar_banco()
     cursor = conn.cursor()
 
     try: 
-        cursor.execute("SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", (cidade,))
+        cursor.execute("SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", (cidade,))
         imoveis = cursor.fetchall()
         lista_imoveis =[]
 
