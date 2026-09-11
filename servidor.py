@@ -64,7 +64,7 @@ def deletar_imovel(id):
         cursor.close()
         conn.close()
 
-@app.route('/imovel/<tipo>', methods=['GET'])
+@app.route('/imovel/tipo/<tipo>', methods=['GET'])
 def busca_tipo(tipo):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -91,7 +91,7 @@ def busca_tipo(tipo):
         cursor.close()
         conn.close()
 
-@app.route('/imovel/<cidade>')
+@app.route('/imovel/cidade/<cidade>', methods=['GET'])
 def busca_cidade(cidade):
     conn = conectar_banco()
     cursor = conn.cursor()

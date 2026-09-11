@@ -59,7 +59,7 @@ def test_busca_tipo_ok(mock_conectar_banco, client):
 
     mock_conectar_banco.return_value = mock_conn
 
-    response = client.get('/imovel/terreno')
+    response = client.get('/imovel/tipo/terreno')
 
     assert response.status_code == 200
     assert response.get_json() == [{'id':4, 'logradouro':'Stacey Isle', 'tipo_logradouro':'Avenida', 'bairro':'Reneeberg', 'cidade':'Bentleymouth', 'cep':'01631','tipo': 'terreno', 'valor': 352507.35, 'data_aquisicao':'2014-11-03'},
@@ -81,7 +81,7 @@ def test_busca_tipo_vazio(mock_conectar_banco, client):
     mock_cursor.fetchall.return_value = []
 
     mock_conectar_banco.return_value = mock_conn
-    response = client.get("/imovel/terreno")
+    response = client.get("/imovel/tipo/terreno")
 
     assert response.status_code == 200
     assert response.get_json() == []
@@ -111,7 +111,7 @@ def test_busca_cidade_ok(mock_conectar_banco, client):
 
     mock_conectar_banco.return_value = mock_conn
 
-    response = client.get('/imovel/Judymouth')
+    response = client.get('/imovel/cidade/Judymouth')
 
     assert response.status_code == 200
     assert response.get_json() == [{'id': 1, 'logradouro':'Nicole Common', 'tipo_logradouro':'Travessa', 'bairro':'Lake Danielle', 'cidade':'Judymouth', 'cep':'85184','tipo': 'casa em condominio', 'valor': 488423.52, 'data_aquisicao':'2017-07-29'},]
@@ -132,7 +132,7 @@ def test_busca_cidade_vazio(mock_conectar_banco, client):
     mock_cursor.fetchall.return_value = []
 
     mock_conectar_banco.return_value = mock_conn
-    response = client.get("/imovel/Teste_nao_existe")
+    response = client.get("/imovel/cidade/Teste_nao_existe")
 
     assert response.status_code == 200
     assert response.get_json() == []
