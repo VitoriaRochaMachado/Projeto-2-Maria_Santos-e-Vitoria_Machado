@@ -169,6 +169,40 @@ def adicionar_imovel():
 
     return jsonify(resposta), 201
 
+@app.route("/imoveis/<int:id>", methods=["PUT"]) 
+def atualizar_imovel(id): 
+
+    dados = request.get_json() 
+    if dados is None: 
+        return jsonify({ "erro": "É necessário enviar um JSON" }), 400 
+    
+    campos_faltando = [] 
+    for campo in CAMPOS_IMOVEL: 
+        if campo not in dados: 
+            campos_faltando.append(campo) 
+    if campos_faltando: 
+        return jsonify({ "erro": "Campos faltando", "campos": campos_faltando }), 400 
+        
+    conn = conectar_banco() 
+    cursor = conn.cursor(dictionary=True) 
+    cursor.execute( "SELECT id FROM imoveis WHERE id = %s", (id,) ) 
+
+    if cursor.fetchone() is None: 
+        cursor.close() 
+        conn.close() 
+        return jsonify({ "erro": "Imóvel não encontrado" }), 404 
+        
+    comando = """ UPDATE imoveis SET logradouro = %s, tipo_logradouro = %s, bairro = %s, cidade = %s, cep = %s, tipo = %s, valor = %s, data_aquisicao = %s WHERE id = %s """ 
+    valores = ( dados["logradouro"], dados["tipo_logradouro"], dados["bairro"], dados["cidade"], dados["cep"], dados["tipo"], dados["valor"], dados["data_aquisicao"], id ) 
+        
+    cursor.execute(comando, valores) 
+    conn.commit() 
+    cursor.execute( "SELECT * FROM imoveis WHERE id = %s", (id,) ) 
+    imovel_atualizado = cursor.fetchone() 
+    cursor.close() 
+    conn.close() 
+    return jsonify(imovel_atualizado), 200
+    
 @app.route('/imovel/<id>', methods=['DELETE'])
 def deletar_imovel(id):
     conn = conectar_banco()
