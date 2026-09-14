@@ -39,7 +39,7 @@ def test_listar_imoveis(mock_conectar_banco, client):
     assert resposta.get_json() == imoveis_falsos
 
     mock_conectar_banco.assert_called_once()
-    conn_mock.cursor.assert_called_once_with(dictionary=True)
+    conn_mock.cursor.assert_called_once_with()
     cursor_mock.execute.assert_called_once_with(
         "SELECT * FROM imoveis"
     )
@@ -255,7 +255,7 @@ def test_atualizar_imoveis(mock_conectar_banco, client):
     assert resposta.get_json() == imovel_atualizado
 
     mock_conectar_banco.assert_called_once()
-    mock_conn.cursor.assert_called_once_with(dictionary=True)
+    mock_conn.cursor.assert_called_once_with()
 
     # A função executa três comandos:
     # SELECT para verificar, UPDATE e SELECT para retornar.
