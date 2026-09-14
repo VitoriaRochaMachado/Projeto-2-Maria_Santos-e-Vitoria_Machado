@@ -1,6 +1,6 @@
 import mysql.connector
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, url_for
+from flask import Flask, jsonify, request
 import os
 
 load_dotenv()
@@ -47,7 +47,7 @@ def criar_tabela():
 @app.route("/imoveis", methods=["GET"])
 def listar_imoveis():
     conn = conectar_banco()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     try:
         cursor.execute("SELECT * FROM imoveis")
@@ -66,9 +66,9 @@ def listar_imoveis():
         conn.close()
 
 @app.route("/imoveis/<int:id>", methods=["GET"])
-def buscar_imovel(id):
+def buscar_imoveis(id):
     conn = conectar_banco()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     cursor.execute(
         "SELECT * FROM imoveis WHERE id = %s",
@@ -99,7 +99,7 @@ CAMPOS_IMOVEL = [
 ]
 
 @app.route("/imoveis", methods=["POST"])
-def adicionar_imovel():
+def adicionar_imoveis():
     dados = request.get_json()
 
     if dados is None:
@@ -170,7 +170,7 @@ def adicionar_imovel():
     return jsonify(resposta), 201
 
 @app.route("/imoveis/<int:id>", methods=["PUT"]) 
-def atualizar_imovel(id): 
+def atualizar_imoveis(id): 
 
     dados = request.get_json() 
     if dados is None: 
@@ -184,7 +184,7 @@ def atualizar_imovel(id):
         return jsonify({ "erro": "Campos faltando", "campos": campos_faltando }), 400 
         
     conn = conectar_banco() 
-    cursor = conn.cursor(dictionary=True) 
+    cursor = conn.cursor() 
     cursor.execute( "SELECT id FROM imoveis WHERE id = %s", (id,) ) 
 
     if cursor.fetchone() is None: 
@@ -203,7 +203,7 @@ def atualizar_imovel(id):
     conn.close() 
     return jsonify(imovel_atualizado), 200
     
-@app.route('/imovel/<id>', methods=['DELETE'])
+@app.route('/imoveis/<id>', methods=['DELETE'])
 def deletar_imovel(id):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -223,7 +223,7 @@ def deletar_imovel(id):
         cursor.close()
         conn.close()
 
-@app.route('/imovel/tipo/<tipo>', methods=['GET'])
+@app.route('/imoveis/tipo/<tipo>', methods=['GET'])
 def busca_tipo(tipo):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -250,7 +250,7 @@ def busca_tipo(tipo):
         cursor.close()
         conn.close()
 
-@app.route('/imovel/cidade/<cidade>', methods=['GET'])
+@app.route('/imoveis/cidade/<cidade>', methods=['GET'])
 def busca_cidade(cidade):
     conn = conectar_banco()
     cursor = conn.cursor()

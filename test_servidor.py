@@ -48,7 +48,7 @@ def test_listar_imoveis(mock_conectar_banco, client):
     conn_mock.close.assert_called_once()
 
 @patch("servidor.conectar_banco")
-def test_buscar_imovel_existente(mock_conectar_banco, client):
+def test_buscar_imoveis_existente(mock_conectar_banco, client):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
 
@@ -75,7 +75,7 @@ def test_buscar_imovel_existente(mock_conectar_banco, client):
     assert resposta.get_json() == imovel_falso
 
 @patch("servidor.conectar_banco")
-def test_buscar_imovel_inexistente(mock_conectar_banco, client):
+def test_buscar_imoveis_inexistente(mock_conectar_banco, client):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
 
@@ -92,7 +92,7 @@ def test_buscar_imovel_inexistente(mock_conectar_banco, client):
     }
 
 @patch("servidor.conectar_banco")
-def test_adicionar_imovel(mock_conectar_banco, client):
+def test_adicionar_imoveis(mock_conectar_banco, client):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
 
@@ -158,7 +158,7 @@ def test_adicionar_imovel(mock_conectar_banco, client):
 
 
 @patch("servidor.conectar_banco")
-def test_adicionar_imovel_sem_json(
+def test_adicionar_imoveis_sem_json(
     mock_conectar_banco,
     client
 ):
@@ -179,7 +179,7 @@ def test_adicionar_imovel_sem_json(
 
 
 @patch("servidor.conectar_banco")
-def test_adicionar_imovel_com_campo_faltando(
+def test_adicionar_imoveis_com_campo_faltando(
     mock_conectar_banco,
     client
 ):
@@ -209,7 +209,7 @@ def test_adicionar_imovel_com_campo_faltando(
     
     mock_conectar_banco.assert_not_called()
 @patch("servidor.conectar_banco")
-def test_atualizar_imovel(mock_conectar_banco, client):
+def test_atualizar_imoveis(mock_conectar_banco, client):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
 
@@ -295,7 +295,7 @@ def test_atualizar_imovel(mock_conectar_banco, client):
 
 
 @patch("servidor.conectar_banco")
-def test_atualizar_imovel_inexistente(
+def test_atualizar_imoveis_inexistente(
     mock_conectar_banco,
     client
 ):
@@ -343,7 +343,7 @@ def test_atualizar_imovel_inexistente(
 
 
 @patch("servidor.conectar_banco")
-def test_atualizar_imovel_sem_json(
+def test_atualizar_imoveis_sem_json(
     mock_conectar_banco,
     client
 ):
@@ -364,7 +364,7 @@ def test_atualizar_imovel_sem_json(
 
 
 @patch("servidor.conectar_banco")
-def test_atualizar_imovel_com_campo_faltando(
+def test_atualizar_imoveis_com_campo_faltando(
     mock_conectar_banco,
     client
 ):
@@ -395,7 +395,7 @@ def test_atualizar_imovel_com_campo_faltando(
     mock_conectar_banco.assert_not_called()
     
 @patch("servidor.conectar_banco")
-def test_deletar_imovel_ok(mock_conectar_banco, client):
+def test_deletar_imoveis_ok(mock_conectar_banco, client):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_conn.cursor.return_value = mock_cursor
@@ -404,7 +404,7 @@ def test_deletar_imovel_ok(mock_conectar_banco, client):
 
     mock_conectar_banco.return_value = mock_conn
 
-    response = client.delete("/imovel/1")
+    response = client.delete("/imoveis/1")
 
     assert response.status_code == 200
     assert response.get_json() == {"Mensagem": "imóvel excluído com sucesso"}
@@ -416,7 +416,7 @@ def test_deletar_imovel_ok(mock_conectar_banco, client):
     mock_conn.close.assert_called_once_with() # o mesmo com o conn
 
 @patch("servidor.conectar_banco")
-def test_deletar_imovel_inexistente(mock_conectar_banco, client):
+def test_deletar_imoveis_inexistente(mock_conectar_banco, client):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_conn.cursor.return_value = mock_cursor
@@ -424,7 +424,7 @@ def test_deletar_imovel_inexistente(mock_conectar_banco, client):
     mock_cursor.rowcount = 0
 
     mock_conectar_banco.return_value = mock_conn
-    response = client.delete("/imovel/99999")
+    response = client.delete("/imoveis/99999")
 
     assert response.status_code == 404
     assert response.get_json() == {"erro": "Imóvel não encontrado"}
@@ -445,7 +445,7 @@ def test_busca_tipo_ok(mock_conectar_banco, client):
 
     mock_conectar_banco.return_value = mock_conn
 
-    response = client.get('/imovel/tipo/terreno')
+    response = client.get('/imoveis/tipo/terreno')
 
     assert response.status_code == 200
     assert response.get_json() == [{'id':4, 'logradouro':'Stacey Isle', 'tipo_logradouro':'Avenida', 'bairro':'Reneeberg', 'cidade':'Bentleymouth', 'cep':'01631','tipo': 'terreno', 'valor': 352507.35, 'data_aquisicao':'2014-11-03'},
@@ -467,7 +467,7 @@ def test_busca_tipo_vazio(mock_conectar_banco, client):
     mock_cursor.fetchall.return_value = []
 
     mock_conectar_banco.return_value = mock_conn
-    response = client.get("/imovel/tipo/terreno")
+    response = client.get("/imoveis/tipo/terreno")
 
     assert response.status_code == 200
     assert response.get_json() == []
@@ -497,7 +497,7 @@ def test_busca_cidade_ok(mock_conectar_banco, client):
 
     mock_conectar_banco.return_value = mock_conn
 
-    response = client.get('/imovel/cidade/Judymouth')
+    response = client.get('/imoveis/cidade/Judymouth')
 
     assert response.status_code == 200
     assert response.get_json() == [{'id': 1, 'logradouro':'Nicole Common', 'tipo_logradouro':'Travessa', 'bairro':'Lake Danielle', 'cidade':'Judymouth', 'cep':'85184','tipo': 'casa em condominio', 'valor': 488423.52, 'data_aquisicao':'2017-07-29'},]
@@ -518,7 +518,7 @@ def test_busca_cidade_vazio(mock_conectar_banco, client):
     mock_cursor.fetchall.return_value = []
 
     mock_conectar_banco.return_value = mock_conn
-    response = client.get("/imovel/cidade/Teste_nao_existe")
+    response = client.get("/imoveis/cidade/Teste_nao_existe")
 
     assert response.status_code == 200
     assert response.get_json() == []
