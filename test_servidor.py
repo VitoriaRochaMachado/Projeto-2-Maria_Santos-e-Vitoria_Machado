@@ -39,7 +39,7 @@ def test_listar_imoveis(mock_conectar_banco, client):
     assert resposta.get_json() == imoveis_falsos
 
     mock_conectar_banco.assert_called_once()
-    conn_mock.cursor.assert_called_once_with()
+    conn_mock.cursor.assert_called_once_with(dictionary=True)
     cursor_mock.execute.assert_called_once_with(
         "SELECT * FROM imoveis"
     )
@@ -255,7 +255,7 @@ def test_atualizar_imoveis(mock_conectar_banco, client):
     assert resposta.get_json() == imovel_atualizado
 
     mock_conectar_banco.assert_called_once()
-    mock_conn.cursor.assert_called_once_with()
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
 
     # A função executa três comandos:
     # SELECT para verificar, UPDATE e SELECT para retornar.
@@ -441,18 +441,27 @@ def test_busca_tipo_ok(mock_conectar_banco, client):
     mock_cursor = MagicMock()
     mock_conn.cursor.return_value = mock_cursor
 
-    mock_cursor.fetchall.return_value = [(4, 'Stacey Isle', 'Avenida', 'Reneeberg', 'Bentleymouth', '01631', 'terreno', 352507.35, '2014-11-03')]
+    mock_cursor.fetchall.return_value = [{'id':4,
+                                          'logradouro': 'Stacey Isle', 
+                                          'tipo_logradouro':'Avenida', 
+                                          'bairro':'Reneeberg', 
+                                          'cidade':'Bentleymouth', 
+                                          'cep':'01631', 
+                                          'tipo':'terreno', 
+                                          'valor':352507.35, 
+                                          'data_aquisicao':'2014-11-03'}]
 
     mock_conectar_banco.return_value = mock_conn
 
     response = client.get('/imoveis/tipo/terreno')
 
     assert response.status_code == 200
-    assert response.get_json() == [{'id':4, 'logradouro':'Stacey Isle', 'tipo_logradouro':'Avenida', 'bairro':'Reneeberg', 'cidade':'Bentleymouth', 'cep':'01631','tipo': 'terreno', 'valor': 352507.35, 'data_aquisicao':'2014-11-03'},
-                                 ]
+    assert response.get_json() == [{'id':4, 'logradouro':'Stacey Isle', 'tipo_logradouro':'Avenida', 'bairro':'Reneeberg', 'cidade':'Bentleymouth', 'cep':'01631','tipo': 'terreno', 'valor': 352507.35, 'data_aquisicao':'2014-11-03'},]
+
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
 
     mock_cursor.execute.assert_called_once_with(
-        "SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", ('terreno',)
+        "SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", ('terreno',)
     )
 
     mock_cursor.close.assert_called_once()
@@ -472,9 +481,12 @@ def test_busca_tipo_vazio(mock_conectar_banco, client):
     assert response.status_code == 200
     assert response.get_json() == []
 
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
+
     mock_cursor.execute.assert_called_once_with(
-            "SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", ('terreno',)
-        )
+    "SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s",
+    ("terreno",)
+)
     
     mock_cursor.close.assert_called_once()
     mock_conn.close.assert_called_once()
@@ -485,15 +497,15 @@ def test_busca_cidade_ok(mock_conectar_banco, client):
     mock_cursor = MagicMock()
     mock_conn.cursor.return_value = mock_cursor
 
-    mock_cursor.fetchall.return_value = [( 1,
-        "Nicole Common",
-        "Travessa",
-        "Lake Danielle",
-        "Judymouth",
-        "85184",
-        "casa em condominio",
-        488423.52,
-        "2017-07-29")]
+    mock_cursor.fetchall.return_value = [{'id':1,
+        'logradouro':"Nicole Common",
+        'tipo_logradouro':"Travessa",
+        'bairro':"Lake Danielle",
+        'cidade':"Judymouth",
+        'cep':"85184",
+        'tipo':"casa em condominio",
+        'valor':488423.52,
+        'data_aquisicao': "2017-07-29"}]
 
     mock_conectar_banco.return_value = mock_conn
 
@@ -501,6 +513,8 @@ def test_busca_cidade_ok(mock_conectar_banco, client):
 
     assert response.status_code == 200
     assert response.get_json() == [{'id': 1, 'logradouro':'Nicole Common', 'tipo_logradouro':'Travessa', 'bairro':'Lake Danielle', 'cidade':'Judymouth', 'cep':'85184','tipo': 'casa em condominio', 'valor': 488423.52, 'data_aquisicao':'2017-07-29'},]
+
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
 
     mock_cursor.execute.assert_called_once_with(
         "SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", ('Judymouth',)
@@ -522,6 +536,8 @@ def test_busca_cidade_vazio(mock_conectar_banco, client):
 
     assert response.status_code == 200
     assert response.get_json() == []
+
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
 
     mock_cursor.execute.assert_called_once_with(
             "SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", ('Teste_nao_existe',)

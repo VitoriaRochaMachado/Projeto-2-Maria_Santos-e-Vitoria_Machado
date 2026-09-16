@@ -47,7 +47,7 @@ def criar_tabela():
 @app.route("/imoveis", methods=["GET"])
 def listar_imoveis():
     conn = conectar_banco()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     try:
         cursor.execute("SELECT * FROM imoveis")
@@ -68,7 +68,7 @@ def listar_imoveis():
 @app.route("/imoveis/<int:id>", methods=["GET"])
 def buscar_imoveis(id):
     conn = conectar_banco()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     cursor.execute(
         "SELECT * FROM imoveis WHERE id = %s",
@@ -184,7 +184,7 @@ def atualizar_imoveis(id):
         return jsonify({ "erro": "Campos faltando", "campos": campos_faltando }), 400 
         
     conn = conectar_banco() 
-    cursor = conn.cursor() 
+    cursor = conn.cursor(dictionary=True) 
     cursor.execute( "SELECT id FROM imoveis WHERE id = %s", (id,) ) 
 
     if cursor.fetchone() is None: 
@@ -203,7 +203,7 @@ def atualizar_imoveis(id):
     conn.close() 
     return jsonify(imovel_atualizado), 200
     
-@app.route('/imoveis/<id>', methods=['DELETE'])
+@app.route('/imoveis/<int:id>', methods=['DELETE'])
 def deletar_imovel(id):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -226,26 +226,14 @@ def deletar_imovel(id):
 @app.route('/imoveis/tipo/<tipo>', methods=['GET'])
 def busca_tipo(tipo):
     conn = conectar_banco()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     try: 
-        cursor.execute("SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", (tipo,))
-        imoveis = cursor.fetchall()
-        lista_imoveis =[]
-
-        for imovel in imoveis:
-            lista_imoveis.append({
-                'id':imovel[0],
-                'logradouro': imovel[1],
-                'tipo_logradouro': imovel[2],
-                'bairro': imovel[3],
-                'cidade': imovel[4],
-                'cep': imovel[5],
-                'tipo': imovel[6],
-                'valor': imovel[7],
-                'data_aquisicao': imovel[8]
-            })
-        return jsonify(lista_imoveis), 200
+        cursor.execute("SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", (tipo,))
+        imoveis = cursor.fetchall() #Como o retorno já está em dicionário, não precisa fazer mais nada
+        
+        return jsonify(imoveis), 200
+    
     finally:
         cursor.close()
         conn.close()
@@ -253,26 +241,14 @@ def busca_tipo(tipo):
 @app.route('/imoveis/cidade/<cidade>', methods=['GET'])
 def busca_cidade(cidade):
     conn = conectar_banco()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     try: 
         cursor.execute("SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", (cidade,))
         imoveis = cursor.fetchall()
-        lista_imoveis =[]
-
-        for imovel in imoveis:
-            lista_imoveis.append({
-                'id':imovel[0],
-                'logradouro': imovel[1],
-                'tipo_logradouro': imovel[2],
-                'bairro': imovel[3],
-                'cidade': imovel[4],
-                'cep': imovel[5],
-                'tipo': imovel[6],
-                'valor': imovel[7],
-                'data_aquisicao': imovel[8]
-            })
-        return jsonify(lista_imoveis), 200
+       
+        return jsonify(imoveis), 200
+    
     finally:
         cursor.close()
         conn.close()
