@@ -54,6 +54,9 @@ def listar_imoveis():
 
         imoveis = cursor.fetchall()
 
+        for imovel in imoveis:
+            adicionar_links(imovel)
+
         return jsonify(imoveis), 200
 
     except mysql.connector.Error:
@@ -84,6 +87,8 @@ def buscar_imovel(id):
         return jsonify({
             "erro": "Imóvel não encontrado"
         }), 404
+
+    imovel = adicionar_links(imovel)
 
     return jsonify(imovel), 200
 
@@ -167,6 +172,9 @@ def adicionar_imovel():
         "data_aquisicao": dados["data_aquisicao"]
     }
 
+    adicionar_links(resposta)
+
+
     return jsonify(resposta), 201
 
 @app.route("/imoveis/<int:id>", methods=["PUT"]) 
@@ -201,15 +209,18 @@ def atualizar_imovel(id):
     imovel_atualizado = cursor.fetchone() 
     cursor.close() 
     conn.close() 
+
+    adicionar_links(imovel_atualizado)
+
     return jsonify(imovel_atualizado), 200
     
-@app.route('/imovel/<id>', methods=['DELETE'])
+@app.route('/imoveis/<int:id>', methods=['DELETE'])
 def deletar_imovel(id):
     conn = conectar_banco()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("DELETE FROM imoveis WHERE id = %s", (int(id),))
+        cursor.execute("DELETE FROM imoveis WHERE id = %s", (id,))
 
         imovel_alterado = cursor.rowcount
         conn.commit()
@@ -217,65 +228,123 @@ def deletar_imovel(id):
         if imovel_alterado == 0:
             return jsonify({"erro": "Imóvel não encontrado"}), 404
 
-        return jsonify({"Mensagem":"imóvel excluído com sucesso"}), 200
+        return jsonify({
+            "Mensagem": "imóvel excluído com sucesso",
+            "_links": {
+                "collection": {
+                    "href": url_for("listar_imoveis")
+                }
+            }
+            }), 200
     
     finally:
         cursor.close()
         conn.close()
 
-@app.route('/imovel/tipo/<tipo>', methods=['GET'])
+@app.route('/imoveis/tipo/<tipo>', methods=['GET'])
 def busca_tipo(tipo):
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    try: 
-        cursor.execute("SELECT logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE tipo = %s", (tipo,))
+    try:
+        cursor.execute(
+            """
+            SELECT id, logradouro, tipo_logradouro, bairro,
+                   cidade, cep, tipo, valor, data_aquisicao
+            FROM imoveis
+            WHERE tipo = %s
+            """,
+            (tipo,)
+        )
+
         imoveis = cursor.fetchall()
-        lista_imoveis =[]
+        lista_imoveis = []
 
         for imovel in imoveis:
-            lista_imoveis.append({
-                'id':imovel[0],
-                'logradouro': imovel[1],
-                'tipo_logradouro': imovel[2],
-                'bairro': imovel[3],
-                'cidade': imovel[4],
-                'cep': imovel[5],
-                'tipo': imovel[6],
-                'valor': imovel[7],
-                'data_aquisicao': imovel[8]
-            })
+            imovel_dict = {
+                "id": imovel[0],
+                "logradouro": imovel[1],
+                "tipo_logradouro": imovel[2],
+                "bairro": imovel[3],
+                "cidade": imovel[4],
+                "cep": imovel[5],
+                "tipo": imovel[6],
+                "valor": imovel[7],
+                "data_aquisicao": imovel[8]
+            }
+
+            adicionar_links(imovel_dict)
+            lista_imoveis.append(imovel_dict)
+
         return jsonify(lista_imoveis), 200
+
     finally:
         cursor.close()
         conn.close()
 
-@app.route('/imovel/cidade/<cidade>', methods=['GET'])
+@app.route('/imoveis/cidade/<cidade>', methods=['GET'])
 def busca_cidade(cidade):
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    try: 
-        cursor.execute("SELECT id, logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao FROM imoveis WHERE cidade = %s", (cidade,))
+    try:
+        cursor.execute(
+            """
+            SELECT id, logradouro, tipo_logradouro, bairro,
+                   cidade, cep, tipo, valor, data_aquisicao
+            FROM imoveis
+            WHERE cidade = %s
+            """,
+            (cidade,)
+        )
+
         imoveis = cursor.fetchall()
-        lista_imoveis =[]
+        lista_imoveis = []
 
         for imovel in imoveis:
-            lista_imoveis.append({
-                'id':imovel[0],
-                'logradouro': imovel[1],
-                'tipo_logradouro': imovel[2],
-                'bairro': imovel[3],
-                'cidade': imovel[4],
-                'cep': imovel[5],
-                'tipo': imovel[6],
-                'valor': imovel[7],
-                'data_aquisicao': imovel[8]
-            })
+            imovel_dict = {
+                "id": imovel[0],
+                "logradouro": imovel[1],
+                "tipo_logradouro": imovel[2],
+                "bairro": imovel[3],
+                "cidade": imovel[4],
+                "cep": imovel[5],
+                "tipo": imovel[6],
+                "valor": imovel[7],
+                "data_aquisicao": imovel[8]
+            }
+
+            adicionar_links(imovel_dict)
+            lista_imoveis.append(imovel_dict)
+
         return jsonify(lista_imoveis), 200
+
     finally:
         cursor.close()
         conn.close()
+
+def adicionar_links(imovel):
+    id_imovel = imovel["id"]
+
+    imovel["_links"] = {
+        "self": {
+            "href": url_for("buscar_imovel", id=id_imovel)
+        },
+        "collection": {
+            "href": url_for("listar_imoveis")
+        },
+        "update": {
+            "href": url_for("atualizar_imovel", id=id_imovel),
+            "method": "PUT"
+        },
+        "delete": {
+            "href": url_for("deletar_imovel", id=id_imovel),
+            "method": "DELETE"
+        }
+    }
+
+    return imovel
+
 
 if __name__ == "__main__":
     criar_tabela()
