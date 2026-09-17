@@ -69,7 +69,7 @@ def listar_imoveis():
         conn.close()
 
 @app.route("/imoveis/<int:id>", methods=["GET"])
-def buscar_imovel(id):
+def buscar_imoveis(id):
     conn = conectar_banco()
     cursor = conn.cursor(dictionary=True)
 
@@ -104,7 +104,7 @@ CAMPOS_IMOVEL = [
 ]
 
 @app.route("/imoveis", methods=["POST"])
-def adicionar_imovel():
+def adicionar_imoveis():
     dados = request.get_json()
 
     if dados is None:
@@ -178,7 +178,7 @@ def adicionar_imovel():
     return jsonify(resposta), 201
 
 @app.route("/imoveis/<int:id>", methods=["PUT"]) 
-def atualizar_imovel(id): 
+def atualizar_imoveis(id): 
 
     dados = request.get_json() 
     if dados is None: 
@@ -215,6 +215,7 @@ def atualizar_imovel(id):
     return jsonify(imovel_atualizado), 200
     
 @app.route('/imoveis/<int:id>', methods=['DELETE'])
+@app.route('/imoveis/<int:id>', methods=['DELETE'])
 def deletar_imovel(id):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -244,7 +245,7 @@ def deletar_imovel(id):
 @app.route('/imoveis/tipo/<tipo>', methods=['GET'])
 def busca_tipo(tipo):
     conn = conectar_banco()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     try:
         cursor.execute(
@@ -258,25 +259,11 @@ def busca_tipo(tipo):
         )
 
         imoveis = cursor.fetchall()
-        lista_imoveis = []
 
         for imovel in imoveis:
-            imovel_dict = {
-                "id": imovel[0],
-                "logradouro": imovel[1],
-                "tipo_logradouro": imovel[2],
-                "bairro": imovel[3],
-                "cidade": imovel[4],
-                "cep": imovel[5],
-                "tipo": imovel[6],
-                "valor": imovel[7],
-                "data_aquisicao": imovel[8]
-            }
+            adicionar_links(imovel)
 
-            adicionar_links(imovel_dict)
-            lista_imoveis.append(imovel_dict)
-
-        return jsonify(lista_imoveis), 200
+        return jsonify(imoveis), 200
 
     finally:
         cursor.close()
@@ -285,7 +272,7 @@ def busca_tipo(tipo):
 @app.route('/imoveis/cidade/<cidade>', methods=['GET'])
 def busca_cidade(cidade):
     conn = conectar_banco()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     try:
         cursor.execute(
@@ -299,25 +286,11 @@ def busca_cidade(cidade):
         )
 
         imoveis = cursor.fetchall()
-        lista_imoveis = []
 
         for imovel in imoveis:
-            imovel_dict = {
-                "id": imovel[0],
-                "logradouro": imovel[1],
-                "tipo_logradouro": imovel[2],
-                "bairro": imovel[3],
-                "cidade": imovel[4],
-                "cep": imovel[5],
-                "tipo": imovel[6],
-                "valor": imovel[7],
-                "data_aquisicao": imovel[8]
-            }
+            adicionar_links(imovel)
 
-            adicionar_links(imovel_dict)
-            lista_imoveis.append(imovel_dict)
-
-        return jsonify(lista_imoveis), 200
+        return jsonify(imoveis), 200
 
     finally:
         cursor.close()
@@ -328,13 +301,13 @@ def adicionar_links(imovel):
 
     imovel["_links"] = {
         "self": {
-            "href": url_for("buscar_imovel", id=id_imovel)
+            "href": url_for("buscar_imoveis", id=id_imovel)
         },
         "collection": {
             "href": url_for("listar_imoveis")
         },
         "update": {
-            "href": url_for("atualizar_imovel", id=id_imovel),
+            "href": url_for("atualizar_imoveis", id=id_imovel),
             "method": "PUT"
         },
         "delete": {
