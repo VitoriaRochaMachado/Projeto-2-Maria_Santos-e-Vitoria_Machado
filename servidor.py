@@ -215,7 +215,6 @@ def atualizar_imoveis(id):
     return jsonify(imovel_atualizado), 200
     
 @app.route('/imoveis/<int:id>', methods=['DELETE'])
-@app.route('/imoveis/<int:id>', methods=['DELETE'])
 def deletar_imovel(id):
     conn = conectar_banco()
     cursor = conn.cursor()
